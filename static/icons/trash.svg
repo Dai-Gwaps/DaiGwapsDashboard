@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve">
+  <g>
+    <linearGradient xmlns="http://www.w3.org/2000/svg" id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="256" x2="256" y1="512" y2="0">
+      <stop stop-opacity="1" stop-color="#fc2567" offset="0"/>
+      <stop stop-opacity="1" stop-color="#fa2697" offset="0.5"/>
+      <stop stop-opacity="1" stop-color="#ba08b5" offset="1"/>
+    </linearGradient>
+    <g xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <path d="m316 192h-40v200h40zm-80 0h-40v200h40zm120-120v-12c0-33.084-26.916-60-60-60h-80c-33.084 0-60 26.916-60 60v12h-120v40h42.087l38.278 346.635c3.359 30.423 28.996 53.365 59.635 53.365h160c30.639 0 56.276-22.942 59.636-53.365l38.277-346.635h42.087v-40zm-160-12c0-11.028 8.972-20 20-20h80c11.028 0 20 8.972 20 20v12h-120zm159.877 394.245c-1.118 10.122-9.663 17.755-19.877 17.755h-160c-10.214 0-18.759-7.633-19.877-17.755l-37.793-342.245h275.34z" fill="url(#SVGID_1_)" data-original="url(#SVGID_1_)"/>
+      </g>
+    </g>
+  </g>
+</svg>

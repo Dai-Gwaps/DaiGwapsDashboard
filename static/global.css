@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Catamaran:wght@100;200;300;400;500;600;700;800;900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	font-family: 'Lato', sans-serif;
+	font-size: 67.5%;
+	box-sizing: border-box;
+}
+
+body {
+	font-size: 1.8rem;
+}
+
+h1,
+h2,
+h3 {
+	font-family: 'Catamaran', sans-serif;
+}
+
+h1 {
+	font-size: 4.8rem;
+}
+
+h2 {
+	font-size: 3.2rem;
+}
+
+h3 {
+	font-size: 2.4rem;
+}
+
+.gradiented {
+	background-image: radial-gradient(
+		circle farthest-corner at 10.2% 55.8%,
+		rgba(252, 37, 103, 1) 0%,
+		rgba(250, 38, 151, 1) 46.2%,
+		rgba(186, 8, 181, 1) 90.1%
+	);
+}

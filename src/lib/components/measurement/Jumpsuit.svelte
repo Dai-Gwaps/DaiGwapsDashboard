@@ -2,15 +2,19 @@
 	let stretchable = false;
 	export let inData;
 	export let measured;
+	let measureDesc;
 
 	function submitta(e) {
 		const formData = new FormData(e.target);
 		for (let field of formData.entries()) {
 			const [key, value] = field;
+			measureDesc += `<b>${key}: </b> ${value} <br />`;
 			const valueF = parseFloat(value);
 			inData[key] = valueF;
 		}
+
 		inData.stretchable = stretchable;
+		inData.description = measureDesc;
 		measured = true;
 	}
 </script>
@@ -25,8 +29,8 @@
 	</div>
 	<div class="single_row">
 		<div class="column">
-			<label for="top_length">Length:</label>
-			<input type="number" step=".5" name="top_length" id="top_length" />
+			<label for="overall_length">Length:</label>
+			<input type="number" step=".5" name="overall_length" id="overall_length" />
 		</div>
 		<div class="column">
 			<label for="shoulder_width">Shoulder:</label>

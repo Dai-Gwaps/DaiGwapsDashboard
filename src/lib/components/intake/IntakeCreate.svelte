@@ -1,40 +1,46 @@
 <script>
-	import { inStore, shStore, idCap } from '$lib/app/store';
+	import axios from 'axios';
+	import { getContext } from 'svelte';
 
-	function submitHandler(e) {
+	let items = getContext('intakes');
+
+	let shipping_group = 0;
+	let original_name = '';
+	let original_quantity = '';
+	let product_cost = '';
+	let startInput;
+
+	function reset() {
+		original_name = '';
+		original_quantity = '';
+		product_cost = '';
+	}
+
+	async function submitHandler(e) {
 		const formData = new FormData(e.target);
 		const data = {};
-		const compare = {};
 		for (let field of formData.entries()) {
 			const [key, value] = field;
 			data[key] = value;
-			compare[key] = value;
 		}
 
-		data.original_quantity = Number(compare.original_quantity);
-		data.product_cost = Number(compare.product_cost);
-		const shipIndex = compare.shipping_group;
-		const shipData = {
-			index: shipIndex,
-			original_quantity: data.original_quantity
-		};
+		const request = { newItem: data, shipping: $items.ship, items: $items.intake };
+		await axios.post('/intake', request).then(async function (response) {
+			const { data } = response;
 
-		shStore.addItem(shipData);
+			if (!data.error) {
+				console.log(data.success);
+				$items = {
+					intake: data.intakeItems,
+					ship: data.shipGroups
+				};
+			} else {
+				console.log(data.error);
+			}
+		});
 
-		data.id = $idCap;
-		$idCap += 1;
-		data.shipping_cost = 0;
-		data.shipping_group = $shStore[shipIndex].shipping_group;
-		data.total_cost = 0;
-		data.recommended_value = 0;
-		data.item_split = false;
-		inStore.addIntake(data);
-
-		const price_update = {
-			group: data.shipping_group,
-			price: $shStore[shipIndex].individual_cost
-		};
-		inStore.priceUpdate(price_update);
+		reset();
+		startInput.focus();
 	}
 </script>
 
@@ -44,23 +50,40 @@
 		<div class="flexrow">
 			<div class="section">
 				<label for="shipping_group">Shipping Group</label>
-				<select name="shipping_group" id="shipping_group">
-					{#each $shStore as option, index}
+				<select name="shipping_group" id="shipping_group" bind:value={shipping_group}>
+					{#each $items.ship as option, index}
 						<option value={index}>{option.shipping_group}</option>
 					{/each}
 				</select>
 			</div>
 			<div class="section">
 				<label for="original_name">Item Name</label>
-				<input type="text" name="original_name" id="original_name" />
+				<input
+					type="text"
+					name="original_name"
+					id="original_name"
+					bind:value={original_name}
+					bind:this={startInput}
+				/>
 			</div>
 			<div class="section">
 				<label for="original_quantity">Item Quantity</label>
-				<input type="number" name="original_quantity" id="original_quantity" />
+				<input
+					type="number"
+					name="original_quantity"
+					id="original_quantity"
+					bind:value={original_quantity}
+				/>
 			</div>
 			<div class="section">
 				<label for="product_cost">Item Cost</label>
-				<input type="number" name="product_cost" id="product_cost" step=".01" />
+				<input
+					type="number"
+					name="product_cost"
+					id="product_cost"
+					step=".01"
+					bind:value={product_cost}
+				/>
 			</div>
 		</div>
 		<button class="submit">Add Item</button>

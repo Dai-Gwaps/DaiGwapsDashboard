@@ -1,15 +1,3 @@
-<script context="module">
-	export async function load({ fetch }) {
-		const res = await fetch('/api/clothing');
-		const data = await res.json();
-		return {
-			props: {
-				clothImport: res.ok && data
-			}
-		};
-	}
-</script>
-
 <script>
 	import { onMount } from 'svelte';
 	import { clStore, ldStore } from '$lib/app/store';

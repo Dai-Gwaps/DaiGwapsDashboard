@@ -1,15 +1,6 @@
-<script context="module">
-	export async function load({ params }) {
-		const index = params.ID;
-		return {
-			props: { index }
-		};
-	}
-</script>
-
 <script>
-	import { inStore, clStore } from '$lib/app/store';
 	import { goto } from '$app/navigation';
+	import axios from 'axios';
 
 	import Top from '$lib/components/measurement/Top.svelte';
 	import Bottom from '$lib/components/measurement/Bottom.svelte';
@@ -18,7 +9,7 @@
 	import TwoPiece from '$lib/components/measurement/TwoPiece.svelte';
 	import ThreePiece from '$lib/components/measurement/ThreePiece.svelte';
 
-	export let index;
+	export let item;
 
 	let colorCount = [1];
 
@@ -26,34 +17,27 @@
 	export let inData = {};
 	export let measured = false;
 
-	const item = $inStore[index];
-
 	function addColor() {
 		const newColorRow = Math.max(...colorCount) + 1;
 		colorCount = [...colorCount, newColorRow];
 		console.log(colorCount);
 	}
 
-	function formHandler(e) {
+	async function formHandler(e) {
 		const formData = new FormData(e.target);
 		const colorArr = [];
 		const quantArr = [];
-		console.log(formData);
-		console.log(e);
+		let quantTot = 0;
 		for (let field of formData.entries()) {
 			const [key, value] = field;
 			let valueF = parseFloat(value);
 			switch (key) {
 				case 'colors':
 					colorArr.push(value);
-					inData[key] = colorArr;
 					break;
 				case 'color_quantity':
-					quantArr.push(value);
-					inData[key] = quantArr;
-					break;
-				case 'quantity':
-					inData[key] = valueF;
+					quantArr.push(valueF);
+					quantTot += valueF;
 					break;
 				case 'price':
 					inData[key] = valueF;
@@ -66,35 +50,29 @@
 					break;
 			}
 		}
+
+		const colorObj = {};
+
+		colorArr.forEach((color, index) => {
+			colorObj[color] = quantArr[index];
+		});
+
+		inData.colors = colorObj;
+
 		inData.original_quantity = item.original_quantity;
 		inData.original_name = item.original_name;
 		inData.shipping_group = item.shipping_group;
 		inData.shopify_update = false;
 		inData.product_cost = item.product_cost;
-		console.log(inData);
+		inData.type = type;
+		inData.quantity = quantTot;
+		const descriptor = `<b>Material: </b> ${inData.material} <br /><br /> ${inData.description}`;
+		inData.description = descriptor;
 
-		switch (type) {
-			case 'Dress':
-				clStore.addDress(inData);
-				break;
-			case 'Top':
-				clStore.addTop(inData);
-				break;
-			case 'Bottom':
-				clStore.addBottom(inData);
-				break;
-			case 'Jumpsuit':
-				clStore.addJumpsuit(inData);
-				break;
-			case 'Two Piece':
-				clStore.addTwoPiece(inData);
-				break;
-			case 'Three Piece':
-				clStore.addThreePiece(inData);
-				break;
-		}
+		await axios.post(`/intake/clothing-${item.id}`, inData);
 
-		inStore.removeIntake(index);
+		await axios.patch(`/intake/clothing-${item.id}`);
+
 		goto('/intake');
 	}
 
@@ -111,14 +89,18 @@
 			<h3>Intake for {item.original_name}</h3>
 			<div class="row">
 				<div class="column">
-					<label for="name">Current Name:</label>
+					<label for="name">Updated Name:</label>
 					<input type="text" name="name" id="name" />
 				</div>
 
 				<div class="column">
-					<label for="quantity">Current Quantity:</label>
-					<input type="text" name="quantity" id="quantity" />
+					<b>Original Quantity:</b>
+					<p>{item.original_quantity}</p>
 				</div>
+			</div>
+			<div class="row">
+				<label for="manufacturer">Manufacturer:</label>
+				<input type="text" name="manufacturer" id="manufacturer" />
 			</div>
 
 			<div class="color_space">
@@ -137,12 +119,13 @@
 					</div>
 				{/each}
 			</div>
-			<div class="row">
-				<div class="column">
+			<div class="column">
+				<div class="row">
 					<b>Recommended Price: </b>
 					<p>${item.recommended_value}</p>
 				</div>
-				<div class="column">
+				<div />
+				<div class="row">
 					<label for="price">Set Price:</label>
 					<input type="text" name="price" id="price" />
 				</div>

@@ -1,18 +1,25 @@
 <script>
-	import { shStore, idCap } from '$lib/app/store';
+	import axios from 'axios';
 
-	function submitHandler(e) {
+	async function submitHandler(e) {
 		const formData = new FormData(e.target);
 		const data = {};
 		for (let field of formData.entries()) {
 			const [key, value] = field;
 			data[key] = value;
 		}
-		data.id = $idCap;
-		$idCap += 1;
 		data.item_quantity = 0;
 		data.individual_cost = 0;
-		shStore.addShip(data);
+		await axios.post('/shipping', data).then(async (response) => {
+			const { data } = response;
+
+			if (data.error) {
+				console.error(data.error);
+			} else {
+				console.log(data.success);
+				console.log(data.group);
+			}
+		});
 	}
 </script>
 
@@ -30,7 +37,7 @@
 			</div>
 			<div class="section">
 				<label for="shipping_cost">Total Shipping Fee</label>
-				<input type="number" name="shipping_cost" id="shipping_cost" />
+				<input type="number" step=".01" name="shipping_cost" id="shipping_cost" />
 			</div>
 		</div>
 		<button class="submit">Add Group</button>

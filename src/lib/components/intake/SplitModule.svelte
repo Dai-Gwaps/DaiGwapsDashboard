@@ -1,25 +1,27 @@
 <script>
-	import { inStore, idCap } from '$lib/app/store';
-
+	import axios from 'axios';
 	import { getContext } from 'svelte';
+	export let intakeItems;
 	const split = getContext('split');
 
 	let i = $split.index;
 
-	let name = $inStore[i].original_name;
+	let name = intakeItems[i].original_name;
 
-	function submitHandler(e) {
+	async function submitHandler(e) {
 		let formData = new FormData(e.target);
 
-		let data = { index: i };
+		let data = {
+			index: i
+		};
 		for (let field of formData.entries()) {
 			const [key, value] = field;
 			data[key] = value;
 		}
-		data.id = $idCap;
-		$idCap += 1;
 
-		inStore.splitItem(data);
+		data.quantity = parseInt(data.quantity);
+
+		await axios.put('/intake', { data, intakeItems });
 
 		$split = { split: false, index: null };
 	}

@@ -1,29 +1,45 @@
 <script>
 	import { getContext } from 'svelte';
-	import { inStore } from '$lib/app/store';
+	import axios from 'axios';
 	import { goto } from '$app/navigation';
 
 	export let index;
+	export let item;
 
 	const split = getContext('split');
+	let items = getContext('intakes');
 
 	let trashFill = false;
 
-	$: shGr = $inStore[index].shipping_group;
-	$: name = $inStore[index].original_name;
-	$: quantity = $inStore[index].original_quantity;
-	$: cost = Number($inStore[index].total_cost.toFixed(2));
+	$: shGr = item.shipping_group;
+	$: name = item.original_name;
+	$: quantity = item.original_quantity;
+	$: cost = Number(item.total_cost?.toFixed(2)) || 0;
 
 	function hoverHandler() {
 		trashFill = !trashFill;
 	}
 
-	function deleteHandler() {
-		inStore.removeIntake(index);
+	async function deleteHandler() {
+		await axios.delete(`/intake`, { id: item.id }).then((response) => {
+			const { data } = response;
+			if (data.success) {
+				$items.intake = $items.intake.filter((num) => num.id !== item.id);
+			}
+		});
+	}
+
+	async function hideHandler() {
+		await axios.patch('/intake', { id: item.id }).then((response) => {
+			const { data } = response;
+			if (data.success) {
+				$items.intake = $items.intake.filter((num) => num.id !== item.id);
+			}
+		});
 	}
 
 	function intakeHandler() {
-		goto(`/intake/${index}`);
+		goto(`/intake/clothing-${item.id}`);
 	}
 
 	function splitHandler() {
@@ -33,9 +49,18 @@
 
 <div class="card">
 	<div class="topbar">
+		<div
+			class="iconClick"
+			on:click={hideHandler}
+			on:mouseenter={hoverHandler}
+			on:mouseleave={hoverHandler}
+		>
+			<img src="/icons/show.svg" alt="Icon of an Eyeball" />
+		</div>
+
 		<p><b>Group: </b>{shGr}</p>
 		<div
-			class="remove"
+			class="iconClick"
 			on:click={deleteHandler}
 			on:mouseenter={hoverHandler}
 			on:mouseleave={hoverHandler}
@@ -129,17 +154,17 @@
 		font-size: 1.8rem;
 		font-weight: 600;
 	}
-	.remove {
+	.iconClick {
 		color: rgb(167, 10, 10);
 	}
 
-	.remove img {
+	.iconClick img {
 		width: 32px;
 		height: 32px;
 		cursor: pointer;
 	}
 
-	.remove img:hover {
+	.iconClick img:hover {
 		width: 36px;
 		height: 36px;
 	}

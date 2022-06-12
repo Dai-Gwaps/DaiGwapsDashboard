@@ -1,15 +1,37 @@
 <script>
-	import { shStore } from '$lib/app/store';
+	import axios from 'axios';
 
-	export let index;
+	export let group;
 
-	$: title = $shStore[index].shipping_group;
-	$: totalCost = Number($shStore[index].shipping_cost.toFixed(2));
-	$: quantity = $shStore[index].item_quantity;
-	$: indCost = Number($shStore[index].individual_cost.toFixed(2));
+	$: title = group.shipping_group;
+	$: totalCost = group.shipping_cost;
+	$: quantity = group.item_quantity;
+	$: indCost = group.individual_cost;
+	$: id = group.id;
 
-	function deleteHandler() {
-		shStore.removeShip(index);
+	async function deleteHandler() {
+		await axios.delete('/shipping', { data: { id } }).then(async (response) => {
+			const { data } = response;
+
+			if (data.error) {
+				console.error(data.error);
+			} else {
+				console.log(data.success);
+			}
+		});
+	}
+
+	async function priceHandler() {
+		await axios.put('/shipping', { group }).then(async (response) => {
+			const { data } = response;
+
+			if (data.error) {
+				console.error(data.error);
+			} else {
+				console.log(data.success);
+				console.log(data.group);
+			}
+		});
 	}
 </script>
 
@@ -23,6 +45,7 @@
 		<p><b>Cost per Item: </b>${indCost}</p>
 	</div>
 	<div class="section3">
+		<button class="price" on:click={priceHandler}>Fix Price</button>
 		<button class="remove" on:click={deleteHandler}>Delete</button>
 	</div>
 </div>
@@ -42,17 +65,22 @@
 	.section1 {
 		display: flex;
 		flex-direction: column;
+		gap: 8px;
 		margin: auto 32px;
 		grid-column: 1/2;
 	}
 	.section2 {
 		display: flex;
 		flex-direction: column;
+		gap: 8px;
 		margin: auto;
 		grid-column: 2/3;
 	}
 
 	.section3 {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 		margin: auto;
 		grid-column: 3/4;
 	}
@@ -62,6 +90,13 @@
 		border: 1px solid red;
 		color: red;
 		border-radius: 5px;
+		padding: 8px 16px;
+	}
+
+	.price {
+		background-color: #fff5fe;
+		border-radius: 5px;
+		font-weight: 600;
 		padding: 8px 16px;
 	}
 </style>
